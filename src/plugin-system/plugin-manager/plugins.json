@@ -1,0 +1,10 @@
+{
+    "cats": {
+        "module": "CatsModule",
+        "load": true
+    },
+    "dogs": {
+        "module": "DogsModule",
+        "load": false
+    }
+}
