@@ -1,42 +1,30 @@
-import * as Plugins from '../plugins'; 
-
 interface Plugin {
-    module: string;
-    load: boolean;
+    module: any;
+    isLoadable: boolean;
 }
 
 class PluginManager {
-    private readonly pluginList: Plugin[];
-    private readonly pluginModuleList: any[];
-    private readonly configFilePath: string;
+    private static pluginManager: PluginManager;
+    private readonly pluginModuleList: any[] = [];
 
-    constructor(configFilePath: string = './src/plugin-system/plugin-manager/plugins.json') {
-        this.pluginList = [];
-        this.pluginModuleList = [];
-        this.configFilePath = configFilePath;
+    private constructor() {}
+
+    public static getInstance(): PluginManager {
+        if(!PluginManager.pluginManager) {
+            PluginManager.pluginManager = new PluginManager();
+        }
+        return PluginManager.pluginManager;
     }
 
-    loadPluginsFromConfig(): void {
-        const path = require('path');
-        const plugins = require(path.resolve(this.configFilePath));
-        
-        for(const plugin in plugins) {
-            this.pluginList.push(plugins[plugin]);
+    public register(plugin: Plugin): void {
+        if(plugin.isLoadable) {
+            this.pluginModuleList.push(plugin.module);
         }
     }
 
-    loadPluginModules(): void {
-        for(const plugin of this.pluginList) {
-            if(plugin.load) this.pluginModuleList.push(Plugins[plugin.module]);
-        }
-    }
-
-    getPluginModuleList() {
+    public getPluginModuleList() {
         return this.pluginModuleList;
     }
 }
 
-const pluginManager = new PluginManager();
-pluginManager.loadPluginsFromConfig();
-pluginManager.loadPluginModules();
-export const PluginModules = pluginManager.getPluginModuleList();
+export const pluginManager: PluginManager = PluginManager.getInstance();
